@@ -1,0 +1,37 @@
+# .github/workflows/terraform.yml
+name: Terraform CI
+
+# This will run the workflow on every pull request
+on:
+  pull_request:
+    branches:
+      - main  # Or the default branch of your repository
+
+jobs:
+  terraform:
+    name: Run Terraform fmt and validate
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository content so that it can be accessed
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: latest
+
+      # Run terraform fmt (recursively) and check if formatting is required
+      - name: Run terraform fmt
+        run: terraform fmt -check -recursive
+        # If formatting issues are found, the job will fail
+
+      # Initialize Terraform (required before validate)
+      - name: Terraform Init
+        run: terraform init
+
+      # Run terraform validate to check the configuration
+      - name: Run terraform validate
+        run: terraform validate
