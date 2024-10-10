@@ -1,11 +1,9 @@
-# .github/workflows/terraform.yml
 name: Terraform CI
 
-# This will run the workflow on every pull request
 on:
   pull_request:
     branches:
-      - main  # Or the default branch of your repository
+      - main  
 
 jobs:
   terraform:
@@ -26,7 +24,6 @@ jobs:
       # Run terraform fmt (recursively) and check if formatting is required
       - name: Run terraform fmt
         run: terraform fmt -check -recursive
-        # If formatting issues are found, the job will fail
 
       # Initialize Terraform (required before validate)
       - name: Terraform Init
