@@ -86,6 +86,6 @@ resource "aws_route_table_association" "private_rt_association" {
 # Create Route for Public Subnets (Internet Access)
 resource "aws_route" "public_route" {
   route_table_id         = aws_route_table.public_rt.id
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = var.destination_cidr_zero
   gateway_id             = aws_internet_gateway.igw.id
 }
