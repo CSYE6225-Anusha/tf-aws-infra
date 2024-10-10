@@ -6,16 +6,20 @@ data "aws_availability_zones" "available" { state = "available" }
 
 # Step 2-1: Create Subnets
 
+# Case: When we need just 1 pvt and 1 pub in each az
 locals {
   actual_private_subnet_count = min(var.total_private_subnets, length(data.aws_availability_zones.available.names))
   actual_public_subnet_count  = min(var.total_public_subnets, length(data.aws_availability_zones.available.names))
 }
 
 resource "aws_subnet" "subnets_public" {
-  count                   = local.actual_public_subnet_count
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr_block, var.subnet_size, count.index)
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  count = local.actual_public_subnet_count
+  # count = var.total_public_subnets
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr_block, var.subnet_size, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  # availability_zone       = element(data.aws_availability_zones.all.names, count.index % length(data.aws_availability_zones.all.names))
+
   map_public_ip_on_launch = true
 
   tags = {
@@ -24,10 +28,12 @@ resource "aws_subnet" "subnets_public" {
 }
 
 resource "aws_subnet" "subnets_private" {
-  count             = local.actual_private_subnet_count
+  count = local.actual_private_subnet_count
+  # count = var.total_private_subnets
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr_block, var.subnet_size, count.index + 3)
   availability_zone = data.aws_availability_zones.available.names[count.index]
+  # availability_zone       = element(data.aws_availability_zones.all.names, count.index % length(data.aws_availability_zones.all.names))
 
   tags = {
     Name = "private-subnet-${count.index + 1}"
@@ -54,6 +60,7 @@ resource "aws_route_table" "public_rt" {
 
 # Associate Public Subnets with Public Route Table
 resource "aws_route_table_association" "public_rt_association" {
+  # count = var.total_public_subnets
   count          = local.actual_public_subnet_count
   subnet_id      = aws_subnet.subnets_public[count.index].id
   route_table_id = aws_route_table.public_rt.id
@@ -70,7 +77,8 @@ resource "aws_route_table" "private_rt" {
 
 # Associate Private Subnets with Private Route Table
 resource "aws_route_table_association" "private_rt_association" {
-  count          = local.actual_private_subnet_count
+  count = local.actual_private_subnet_count
+  # count = var.total_private_subnets
   subnet_id      = aws_subnet.subnets_private[count.index].id
   route_table_id = aws_route_table.private_rt.id
 }
