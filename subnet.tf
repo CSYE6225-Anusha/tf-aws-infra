@@ -6,9 +6,9 @@ data "aws_availability_zones" "available" { state = "available" }
 
 # Step 2-1: Create Subnets
 
-locals{
-  actual_private_subnet_count = min(var.total_private_subnets,length(data.aws_availability_zones.available.names))
-  actual_public_subnet_count = min(var.total_public_subnets,length(data.aws_availability_zones.available.names))
+locals {
+  actual_private_subnet_count = min(var.total_private_subnets, length(data.aws_availability_zones.available.names))
+  actual_public_subnet_count  = min(var.total_public_subnets, length(data.aws_availability_zones.available.names))
 }
 
 resource "aws_subnet" "subnets_public" {

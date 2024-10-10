@@ -1,6 +1,5 @@
 name: Terraform CI
 
-# This will run the workflow on every pull request
 on:
   pull_request:
     branches:
