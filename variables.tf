@@ -6,7 +6,6 @@ variable "profile" {
 variable "region" {
   type        = string
   description = "AWS infrastructure region"
-  default     = "us-east-1"
 }
 
 variable "vpc_cidr_block" {
@@ -27,5 +26,4 @@ variable "total_private_subnets" {
 variable "subnet_size" {
   type        = number
   description = "Subnet size"
-  default     = 8
 }
