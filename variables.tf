@@ -27,3 +27,8 @@ variable "subnet_size" {
   type        = number
   description = "Subnet size"
 }
+
+variable "destination_cidr_zero" {
+  type        = string
+  description = "Destination CIDR"
+}
