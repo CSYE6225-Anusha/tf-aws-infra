@@ -9,7 +9,7 @@ This Terraform configuration sets up public and private subnets within a VPC, as
   - Automatically creates public and private subnets across all available zones.
   - Dynamically adjusts the number of subnets based on availability zone count.
   
-- **Public Subnet Configuration**:
+- **Public Subnet Configuration**:hgi
   - Associates public subnets with an Internet Gateway, enabling external internet access.
   - Applies a public route table that routes traffic to the internet.
 
