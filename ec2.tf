@@ -73,9 +73,9 @@ resource "aws_instance" "app_instance" {
 
   # EBS root volume configuration
   root_block_device {
-    volume_size           = 25   
-    volume_type           = "gp2" 
-    delete_on_termination = true  
+    volume_size           = 25
+    volume_type           = "gp2"
+    delete_on_termination = true
   }
 
   # Tag the instance

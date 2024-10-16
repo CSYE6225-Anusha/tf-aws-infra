@@ -38,8 +38,8 @@ variable "port" {
   description = "My application port"
 }
 
-variable instance_type{
-  type = string
+variable "instance_type" {
+  type        = string
   description = "Instance Type"
-  default = "t2.micro"
+  default     = "t2.micro"
 }
