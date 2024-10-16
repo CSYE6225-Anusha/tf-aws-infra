@@ -6,28 +6,28 @@ resource "aws_security_group" "application_security_group" {
   # Ingress rule to allow SSH (Port 22)
   ingress {
     description = "Allow SSH from anywhere"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = var.ssh_port
+    to_port     = var.ssh_port
+    protocol    = var.protocol
+    cidr_blocks = [var.destination_cidr_zero]
   }
 
   # Ingress rule to allow HTTP (Port 80)
   ingress {
     description = "Allow HTTP traffic from anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = var.http_port
+    to_port     = var.http_port
+    protocol    = var.protocol
+    cidr_blocks = [var.destination_cidr_zero]
   }
 
   # Ingress rule to allow HTTPS (Port 443)
   ingress {
     description = "Allow HTTPS traffic from anywhere"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = var.https_port
+    to_port     = var.https_port
+    protocol    = var.protocol
+    cidr_blocks = [var.destination_cidr_zero]
   }
 
   # Ingress rule to allow traffic on my application port 
@@ -35,16 +35,16 @@ resource "aws_security_group" "application_security_group" {
     description = "Allow application traffic from anywhere"
     from_port   = var.port
     to_port     = var.port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = var.protocol
+    cidr_blocks = [var.destination_cidr_zero]
   }
 
   # Egress rule to allow all outbound traffic
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = var.outbound_port
+    to_port     = var.outbound_port
+    protocol    = var.outbound_protocol
+    cidr_blocks = [var.destination_cidr_zero]
   }
 
   tags = {
@@ -69,13 +69,13 @@ resource "aws_instance" "app_instance" {
   subnet_id              = aws_subnet.subnets_public[0].id
 
   # Disable accidental termination protection
-  disable_api_termination = false
+  disable_api_termination = var.disable_api_termination
 
   # EBS root volume configuration
   root_block_device {
-    volume_size           = 25
-    volume_type           = "gp2"
-    delete_on_termination = true
+    volume_size           = var.volume_size
+    volume_type           = var.volume_type
+    delete_on_termination = var.delete_on_termination
   }
 
   # Tag the instance
