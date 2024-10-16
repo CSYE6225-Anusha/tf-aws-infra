@@ -32,3 +32,14 @@ variable "destination_cidr_zero" {
   type        = string
   description = "Destination CIDR"
 }
+
+variable "port" {
+  type        = number
+  description = "My application port"
+}
+
+variable "instance_type" {
+  type        = string
+  description = "Instance Type"
+  default     = "t2.micro"
+}
