@@ -96,3 +96,7 @@ variable "disable_api_termination" {
   type = bool
 }
 
+variable "key-pair" {
+  type    = string
+  default = "my-key-pair"
+}
