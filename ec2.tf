@@ -64,7 +64,7 @@ data "aws_ami" "my_ami" {
 resource "aws_instance" "app_instance" {
   ami                    = data.aws_ami.my_ami.id
   instance_type          = var.instance_type
-  key_name               = "my-key-pair"
+  key_name               = var.key-pair
   vpc_security_group_ids = [aws_security_group.application_security_group.id]
   subnet_id              = aws_subnet.subnets_public[0].id
 
