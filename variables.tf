@@ -161,3 +161,23 @@ variable "dialect"{
   type = string
   default = "postgres"
 }
+
+variable "allocated_storage"{
+  description = "Allocated Storage"
+  type = number
+}
+
+variable "skip_final_snapshot" {
+  description = "Skip Final Snapshot"
+  type = bool
+}
+
+variable "db_port" {
+  description = "Database Port"
+  type = number
+}
+
+variable "db_family" {
+  description = "Database Family"
+  type = string
+}

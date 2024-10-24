@@ -58,20 +58,11 @@ resource "aws_security_group" "database_security_group" {
   description = "Security group for RDS instance"
   vpc_id      = aws_vpc.main.id
 
-  # Ingress rule to allow SSH (Port 22)
-  ingress {
-    description = "Allow SSH from anywhere"
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = var.protocol
-    cidr_blocks = [var.destination_cidr_zero]
-  }
-
   # Ingress rule to allow Postgres (Port 5432)
   ingress {
     description = "Allow PostgreSQL traffic from application security group"
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = var.db_port
+    to_port     = var.db_port
     protocol    = var.protocol
     security_groups = [aws_security_group.application_security_group.id]
   }
@@ -92,7 +83,7 @@ resource "aws_security_group" "database_security_group" {
 # RDS Parameter Group for the database
 resource "aws_db_parameter_group" "private_db_parameter_group" {
   name        = "custom-db-parameter-group"
-  family      = "postgres16"
+  family      = var.db_family
   description = "Custom parameter group for the RDS instance"
   parameter {
     name  = "log_min_duration_statement"
@@ -126,12 +117,12 @@ resource "aws_db_instance" "db_instance" {
   identifier           = var.identifier
   username             = var.username
   password             = var.password
-  allocated_storage = 20
+  allocated_storage    = var.allocated_storage
   db_subnet_group_name = aws_db_subnet_group.private_db_subnet_group.name
   publicly_accessible = var.publicly_accessible
   db_name              = var.db_name
   vpc_security_group_ids = [aws_security_group.database_security_group.id]
-  skip_final_snapshot = true
+  skip_final_snapshot = var.skip_final_snapshot
   parameter_group_name = aws_db_parameter_group.private_db_parameter_group.name
   tags={
     Name = "My Database Instance"
@@ -166,12 +157,12 @@ resource "aws_instance" "app_instance" {
     echo "DB_PASSWORD=${aws_db_instance.db_instance.password}" >> .env
     echo "host=${aws_db_instance.db_instance.address}" >> .env
     echo "dialect=${var.dialect}" >> .env
-    sudo systemctl daemon-reload
+    sudo chown csye6225:csye6225 .env
+    sudo chmod 755 .env
+    sudo systemctl start webapp.service
     sudo systemctl enable webapp.service
     
   EOF
-
-  # keep ssl shit in sequalize : TODO and aslo add start of webapp.service in user_data
 
   # Tag the instance
   tags = {
