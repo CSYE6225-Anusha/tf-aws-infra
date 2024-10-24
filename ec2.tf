@@ -67,14 +67,6 @@ resource "aws_security_group" "database_security_group" {
     security_groups = [aws_security_group.application_security_group.id]
   }
 
-  # Egress rule to allow all outbound traffic
-  egress {
-    from_port   = var.outbound_port
-    to_port     = var.outbound_port
-    protocol    = var.outbound_protocol
-    cidr_blocks = [var.destination_cidr_zero]
-  }
-
   tags = {
     Name = "database_security_group"
   }
