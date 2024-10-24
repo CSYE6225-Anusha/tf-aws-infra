@@ -156,28 +156,28 @@ variable "publicly_accessible" {
   type        = bool
 }
 
-variable "dialect"{
+variable "dialect" {
   description = "Application Dialect"
-  type = string
-  default = "postgres"
+  type        = string
+  default     = "postgres"
 }
 
-variable "allocated_storage"{
+variable "allocated_storage" {
   description = "Allocated Storage"
-  type = number
+  type        = number
 }
 
 variable "skip_final_snapshot" {
   description = "Skip Final Snapshot"
-  type = bool
+  type        = bool
 }
 
 variable "db_port" {
   description = "Database Port"
-  type = number
+  type        = number
 }
 
 variable "db_family" {
   description = "Database Family"
-  type = string
+  type        = string
 }

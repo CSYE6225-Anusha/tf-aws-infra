@@ -60,10 +60,10 @@ resource "aws_security_group" "database_security_group" {
 
   # Ingress rule to allow Postgres (Port 5432)
   ingress {
-    description = "Allow PostgreSQL traffic from application security group"
-    from_port   = var.db_port
-    to_port     = var.db_port
-    protocol    = var.protocol
+    description     = "Allow PostgreSQL traffic from application security group"
+    from_port       = var.db_port
+    to_port         = var.db_port
+    protocol        = var.protocol
     security_groups = [aws_security_group.application_security_group.id]
   }
 
@@ -87,7 +87,7 @@ resource "aws_db_parameter_group" "private_db_parameter_group" {
   description = "Custom parameter group for the RDS instance"
   parameter {
     name  = "log_min_duration_statement"
-    value = "1000"   # Log queries that take longer than 1 second
+    value = "1000" # Log queries that take longer than 1 second
   }
 
   tags = {
@@ -96,7 +96,7 @@ resource "aws_db_parameter_group" "private_db_parameter_group" {
 }
 
 resource "aws_db_subnet_group" "private_db_subnet_group" {
-  name = "private_db_subnet_group"
+  name       = "private_db_subnet_group"
   subnet_ids = [for i in aws_subnet.subnets_private : i.id]
 }
 
@@ -110,21 +110,21 @@ data "aws_ami" "my_ami" {
 
 // Database Instance
 resource "aws_db_instance" "db_instance" {
-  engine               = var.engine
-  engine_version       = var.engine_version
-  instance_class       = var.instance_class
-  multi_az             = var.multi_az
-  identifier           = var.identifier
-  username             = var.username
-  password             = var.password
-  allocated_storage    = var.allocated_storage
-  db_subnet_group_name = aws_db_subnet_group.private_db_subnet_group.name
-  publicly_accessible = var.publicly_accessible
-  db_name              = var.db_name
+  engine                 = var.engine
+  engine_version         = var.engine_version
+  instance_class         = var.instance_class
+  multi_az               = var.multi_az
+  identifier             = var.identifier
+  username               = var.username
+  password               = var.password
+  allocated_storage      = var.allocated_storage
+  db_subnet_group_name   = aws_db_subnet_group.private_db_subnet_group.name
+  publicly_accessible    = var.publicly_accessible
+  db_name                = var.db_name
   vpc_security_group_ids = [aws_security_group.database_security_group.id]
-  skip_final_snapshot = var.skip_final_snapshot
-  parameter_group_name = aws_db_parameter_group.private_db_parameter_group.name
-  tags={
+  skip_final_snapshot    = var.skip_final_snapshot
+  parameter_group_name   = aws_db_parameter_group.private_db_parameter_group.name
+  tags = {
     Name = "My Database Instance"
   }
 }
