@@ -94,6 +94,7 @@ resource "aws_db_subnet_group" "private_db_subnet_group" {
 
 data "aws_ami" "my_ami" {
   most_recent = true
+  owners = ["676206927418"]
   filter {
     name   = "name"
     values = ["csye6225*"]
@@ -121,6 +122,11 @@ resource "aws_db_instance" "db_instance" {
   }
 }
 
+# resource "aws_iam_instance_profile" "instance_profile" {
+#   name = "ec2_profile"
+#   role = aws_iam_role.ec2_role.name
+# }
+
 # Create EC2 instance
 resource "aws_instance" "app_instance" {
   ami                    = data.aws_ami.my_ami.id
@@ -131,6 +137,9 @@ resource "aws_instance" "app_instance" {
 
   # Disable accidental termination protection
   disable_api_termination = var.disable_api_termination
+
+  # Attach IAM role
+  # iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
 
   # EBS root volume configuration
   root_block_device {
