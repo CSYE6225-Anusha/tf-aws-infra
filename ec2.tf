@@ -94,7 +94,7 @@ resource "aws_db_subnet_group" "private_db_subnet_group" {
 
 data "aws_ami" "my_ami" {
   most_recent = true
-  owners = ["676206927418"]
+  owners = var.ami_owner
   filter {
     name   = "name"
     values = ["csye6225*"]
@@ -122,10 +122,10 @@ resource "aws_db_instance" "db_instance" {
   }
 }
 
-# resource "aws_iam_instance_profile" "instance_profile" {
-#   name = "ec2_profile"
-#   role = aws_iam_role.ec2_role.name
-# }
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = "ec2_profile"
+  role = aws_iam_role.ec2_role.name
+}
 
 # Create EC2 instance
 resource "aws_instance" "app_instance" {
@@ -139,7 +139,7 @@ resource "aws_instance" "app_instance" {
   disable_api_termination = var.disable_api_termination
 
   # Attach IAM role
-  # iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
 
   # EBS root volume configuration
   root_block_device {
@@ -158,8 +158,11 @@ resource "aws_instance" "app_instance" {
     echo "DB_PASSWORD=${aws_db_instance.db_instance.password}" >> .env
     echo "host=${aws_db_instance.db_instance.address}" >> .env
     echo "dialect=${var.dialect}" >> .env
+    echo "S3_BUCKET_NAME=${aws_s3_bucket.my_bucket.bucket}" >> .env
     sudo chown csye6225:csye6225 .env
     sudo chmod 755 .env
+    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/app/webapp/cloudwatch-config.json -s
+    sudo service amazon-cloudwatch-agent restart
     sudo systemctl start webapp.service
     sudo systemctl enable webapp.service
     

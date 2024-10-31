@@ -1,6 +1,7 @@
 # Terraform AWS Infrastructure
 
 ## What it does 🤖
+
 This Terraform configuration sets up an EC2 instance with a security group for web applications, utilizing a custom Amazon Machine Image (AMI) built in the web application's GitHub Actions workflow. It provisions an Amazon RDS (Relational Database Service) instance with a dedicated security group, allowing secure communication with the application and enabling traffic on the specified database port (default: PostgreSQL 5432). The RDS configuration also includes a custom parameter group. All infrastructure is managed within a custom VPC, ensuring secure access and proper resource management.
 
 ## Features 🚀
@@ -14,41 +15,63 @@ This Terraform configuration sets up an EC2 instance with a security group for w
   - Ensures EBS volumes are terminated when the EC2 instance is terminated.
   - Protects against accidental termination if configured.
 
+- **IAM Roles and Policies**:
+  - Creates IAM roles and policies required for the EC2 instance to access S3 and use the CloudWatch Agent.
+  - Attaches the IAM role to the EC2 instance, granting it the necessary permissions to send logs and metrics to CloudWatch.
+
+- **Unified CloudWatch Agent Setup**:
+  - Installs the Unified CloudWatch Agent in the AMI, which is set up to start automatically on instance launch.
+  - Configures the CloudWatch Agent to monitor EC2 instance logs and metrics.
+
+- **User Data Script Configuration**:
+  - Uses a user data script to configure and restart the CloudWatch Agent on EC2 instance startup, ensuring log and metric collection begins immediately.
+
 - **Dynamic Resource Management**:
   - Automatically retrieves the latest custom AMI for the application.
   - Applies the appropriate security group to the EC2 instance.
 
-- **Amazon RDS Configuration:**:
+- **Amazon RDS Configuration**:
   - Provisions an Amazon RDS instance with a dedicated security group for secure communication.
   - Configures ingress rules to allow traffic on the specified database port from the application security group.
   - Utilizes a custom parameter group for managing database settings.
 
 ## How to Use ⚙
 
-- [x] Ensure you have Terraform installed and AWS credentials configured.
+1. **Ensure Terraform installed and AWS credentials configured**:
+   - [x] Install Terraform and configure AWS credentials with sufficient permissions.
 
-- [x] Clone the repository
-  - `git clone git@github.com:CSYE6225-Anusha/tf-aws-infra.git`
+2. **Clone the repository**:
+   - `git clone git@github.com:CSYE6225-Anusha/tf-aws-infra.git`
 
-- [x] Modify the variables as needed
-  - `instance_type`: Specify the instance type for the EC2 instance.
-  - `key-pair`: Specify the key pair name for SSH access.
-  - `volume_size`: Set the root volume size (default is 25).
-  - `volume_type`: Specify the root volume type (default is GP2).
+3. **Modify variables as needed**:
+   - `instance_type`: Specify the instance type for the EC2 instance.
+   - `key-pair`: Specify the key pair name for SSH access.
+   - `volume_size`: Set the root volume size (default is 25).
+   - `volume_type`: Specify the root volume type (default is GP2).
 
-- [x] Initialize Terraform
-  - `terraform init`
-  
-- [x] Create an Execution Plan
-  - `terraform plan`
+4. **Initialize Terraform**:
+   - `terraform init`
 
-- [x] Apply the configuration
-  - `terraform apply`
-  
-- [x] Destroy Terraform
-  - `terraform destroy`
+5. **Create an Execution Plan**:
+   - `terraform plan`
+
+6. **Apply the configuration**:
+   - `terraform apply`
+
+7. **Destroy the Infrastructure**:
+   - `terraform destroy`
+
+## IAM Role and CloudWatch Agent Setup 🛠
+
+- **IAM Role for EC2**: 
+  - A custom IAM role is attached to the EC2 instance, allowing it to use the CloudWatch Agent to publish logs and metrics.
+  - Policies are included for S3 access (for application needs) and CloudWatch (for logging and monitoring).
+
+- **User Data Script**:
+  - The user data script sets up and restarts the CloudWatch Agent on EC2 instance launch, ensuring it begins monitoring as soon as the instance is live.
 
 ## Variables
+
 Ensure to set the following variables either in a `terraform.tfvars` file or pass them via the command line:
 
 - `profile`: AWS CLI profile to use for authentication.
@@ -77,7 +100,11 @@ Ensure to set the following variables either in a `terraform.tfvars` file or pas
 - `skip_final_snapshot`: Flag to skip the final snapshot on deletion.
 - `db_port`: Database port.
 - `db_family`: Family for the RDS parameter group.
-
+- `domain`: Your domain name
+- `ami_owner`: AMI owner 
+- `days`: Days for s3 
+- `sse_algorithm`: S3 encryption algorithm
+- `storage_class`: S3 storage class
 
 ## Contributing ✨
 
@@ -86,7 +113,8 @@ Ensure to set the following variables either in a `terraform.tfvars` file or pas
 3. **Create a pull request** to propose your changes.
 4. **Run the CI checks** to ensure all workflows pass before merging.
 
-## Support the Project with a ⭐ 
+## Support the Project with a ⭐
+
 ```terraform
 if (youEnjoyed) {
     starThisRepository();
