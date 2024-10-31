@@ -181,3 +181,28 @@ variable "db_family" {
   description = "Database Family"
   type        = string
 }
+
+variable "domain" {
+  description = "Top Level Domain"
+  type        = string
+}
+
+variable "ami_owner" {
+  description = "AMI Owner"
+  type        = list(string)
+}
+
+variable "days" {
+  type        = number
+  description = "Number of days before transitioning to STANDARD_IA"
+}
+
+variable "sse_algorithm" {
+  type        = string
+  description = "Server-side encryption algorithm"
+}
+
+variable "storage_class" {
+  type        = string
+  description = "The storage class to transition to after the specified days"
+}
