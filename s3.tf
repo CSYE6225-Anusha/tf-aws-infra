@@ -1,10 +1,10 @@
 resource "random_uuid" "bucket_id" {}
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = random_uuid.bucket_id.result
+  bucket        = random_uuid.bucket_id.result
   force_destroy = true
-   tags = {
-    Name        = "My S3 Bucket"
+  tags = {
+    Name = "My S3 Bucket"
   }
 }
 
@@ -34,8 +34,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
   bucket = aws_s3_bucket.my_bucket.id
-   rule {
-    id = "lifecycle"
+  rule {
+    id     = "lifecycle"
     status = "Enabled"
     transition {
       days          = var.days
@@ -47,7 +47,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "S3AccessPolicy"
   description = "Policy to allow getting, updating, and deleting S3 objects"
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "s3_access_policy" {
         ],
         Resource = [
           "${aws_s3_bucket.my_bucket.arn}",
-          "${aws_s3_bucket.my_bucket.arn}/*"   
+          "${aws_s3_bucket.my_bucket.arn}/*"
         ]
       }
     ]

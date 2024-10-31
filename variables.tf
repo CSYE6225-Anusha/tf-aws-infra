@@ -182,14 +182,14 @@ variable "db_family" {
   type        = string
 }
 
-variable "domain"{
+variable "domain" {
   description = "Top Level Domain"
-  type = string
+  type        = string
 }
 
-variable ami_owner{
+variable "ami_owner" {
   description = "AMI Owner"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "days" {

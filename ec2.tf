@@ -94,7 +94,7 @@ resource "aws_db_subnet_group" "private_db_subnet_group" {
 
 data "aws_ami" "my_ami" {
   most_recent = true
-  owners = var.ami_owner
+  owners      = var.ami_owner
   filter {
     name   = "name"
     values = ["csye6225*"]
@@ -139,7 +139,7 @@ resource "aws_instance" "app_instance" {
   disable_api_termination = var.disable_api_termination
 
   # Attach IAM role
-  iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.instance_profile.name
 
   # EBS root volume configuration
   root_block_device {

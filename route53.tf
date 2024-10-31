@@ -1,5 +1,5 @@
 data "aws_route53_zone" "primary" {
-  name         = "${var.profile}.${var.domain}"
+  name = "${var.profile}.${var.domain}"
 }
 
 resource "aws_route53_record" "new_record" {
