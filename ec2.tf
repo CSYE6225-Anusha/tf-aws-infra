@@ -12,30 +12,12 @@ resource "aws_security_group" "application_security_group" {
     cidr_blocks = [var.destination_cidr_zero]
   }
 
-  # Ingress rule to allow HTTP (Port 80)
-  # ingress {
-  #   description = "Allow HTTP traffic from anywhere"
-  #   from_port   = var.http_port
-  #   to_port     = var.http_port
-  #   protocol    = var.protocol
-  #   cidr_blocks = [var.destination_cidr_zero]
-  # }
-
-  # Ingress rule to allow HTTPS (Port 443)
-  # ingress {
-  #   description = "Allow HTTPS traffic from anywhere"
-  #   from_port   = var.https_port
-  #   to_port     = var.https_port
-  #   protocol    = var.protocol
-  #   cidr_blocks = [var.destination_cidr_zero]
-  # }
-
   # Ingress rule to allow traffic on my application port 
   ingress {
-    description = "Allow application traffic from load balancer"
-    from_port   = var.port
-    to_port     = var.port
-    protocol    = var.protocol
+    description     = "Allow application traffic from load balancer"
+    from_port       = var.port
+    to_port         = var.port
+    protocol        = var.protocol
     security_groups = [aws_security_group.lb_sg.id]
   }
 
@@ -165,7 +147,7 @@ resource "aws_iam_instance_profile" "instance_profile" {
 #     sudo service amazon-cloudwatch-agent restart
 #     sudo systemctl start webapp.service
 #     sudo systemctl enable webapp.service
-    
+
 #   EOF
 
 #   # Tag the instance
@@ -174,8 +156,8 @@ resource "aws_iam_instance_profile" "instance_profile" {
 #   }
 # }
 
-resource "aws_security_group" "lb_sg"{
-  name = "load_balancer"
+resource "aws_security_group" "lb_sg" {
+  name        = "load_balancer"
   description = "Security group for the load balancer"
   vpc_id      = aws_vpc.main.id
 
@@ -219,13 +201,13 @@ resource "aws_launch_template" "app_lt" {
     security_groups             = [aws_security_group.application_security_group.id]
   }
 
-   iam_instance_profile {
+  iam_instance_profile {
     name = aws_iam_instance_profile.instance_profile.name
   }
 
   disable_api_termination = false
 
-  user_data =  base64encode(<<-EOF
+  user_data = base64encode(<<-EOF
     #!/bin/bash
     cd /opt/csye6225/app/webapp
     touch .env
@@ -249,19 +231,18 @@ resource "aws_launch_template" "app_lt" {
 //Auto scaling group
 resource "aws_autoscaling_group" "webapp_asg" {
   name                = "webapp-asg"
-  vpc_zone_identifier = [for s in aws_subnet.subnets_public: s.id]
-
-  target_group_arns = [aws_lb_target_group.app_target_group.arn]
+  vpc_zone_identifier = [for s in aws_subnet.subnets_public : s.id]
+  target_group_arns   = [aws_lb_target_group.app_target_group.arn]
   launch_template {
     id      = aws_launch_template.app_lt.id
     version = "$Latest"
   }
-  min_size                  = 1
-  max_size                  = 3
-  desired_capacity          = 1
-  health_check_type         = "ELB"
-  health_check_grace_period = 120
-  default_cooldown          = 60
+  min_size                  = var.min_size
+  max_size                  = var.max_size
+  desired_capacity          = var.desired_capacity
+  health_check_type         = var.health_check_type
+  health_check_grace_period = var.health_check_grace_period
+  default_cooldown          = var.default_cooldown
   tag {
     key                 = "Name"
     value               = "WebApp EC2 Instance"
@@ -269,38 +250,36 @@ resource "aws_autoscaling_group" "webapp_asg" {
   }
 }
 
-# CloudWatch Alarm for Scaling Up (CPU > 5%)
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   alarm_name          = "cpu_high"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = 300
-  statistic           = "Average"
-  threshold           = 5
+  comparison_operator = var.comparison_operator_greater
+  evaluation_periods  = var.evaluation_periods
+  metric_name         = var.metric_name
+  namespace           = var.namespace
+  period              = var.period
+  statistic           = var.statistic
+  threshold           = var.threshold_greater
 
-  alarm_description   = "Alarm when CPU exceeds 5% to scale up"
+  alarm_description = "Alarm when CPU exceeds"
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.webapp_asg.name
   }
 
-  # Links the alarm to the scale-up policy
   alarm_actions = [aws_autoscaling_policy.scale_up.arn]
 }
 
 # CloudWatch Alarm for Scaling Down (CPU < 3%)
 resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   alarm_name          = "cpu_low"
-  comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = 300
-  statistic           = "Average"
-  threshold           = 3
+  comparison_operator = var.comparison_operator_less
+  evaluation_periods  = var.evaluation_periods
+  metric_name         = var.metric_name
+  namespace           = var.namespace
+  period              = var.period
+  statistic           = var.statistic
+  threshold           = var.threshold_lesser
 
-  alarm_description   = "Alarm when CPU is below 3% to scale down"
+  alarm_description = "Alarm when CPU is below 3% to scale down"
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.webapp_asg.name
   }
@@ -364,7 +343,7 @@ resource "aws_lb_target_group" "app_target_group" {
 # Load Balancer Listener
 resource "aws_lb_listener" "app_lb_listener" {
   load_balancer_arn = aws_lb.app-lb.arn
-  port              = 80
+  port              = var.http_port
   protocol          = "HTTP"
 
   default_action {
