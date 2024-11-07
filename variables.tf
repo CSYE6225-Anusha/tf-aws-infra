@@ -206,3 +206,80 @@ variable "storage_class" {
   type        = string
   description = "The storage class to transition to after the specified days"
 }
+
+# Auto-scaling Configuration
+variable "min_size" {
+  type        = number
+  description = "Minimum number of instances in the auto-scaling group"
+}
+
+variable "max_size" {
+  type        = number
+  description = "Maximum number of instances in the auto-scaling group"
+}
+
+variable "desired_capacity" {
+  type        = number
+  description = "Desired capacity of instances in the auto-scaling group"
+}
+
+variable "health_check_type" {
+  type        = string
+  description = "Health check type for the auto-scaling group"
+}
+
+variable "health_check_grace_period" {
+  type        = number
+  description = "Health check grace period for the auto-scaling group, in seconds"
+}
+
+variable "default_cooldown" {
+  type        = number
+  description = "Cooldown period before another scaling activity is allowed"
+}
+
+variable "comparison_operator_greater" {
+  type        = string
+  description = "The operator used to compare the metric with the threshold (greater)"
+}
+
+variable "comparison_operator_less" {
+  type        = string
+  description = "The operator used to compare the metric with the threshold (lesser)"
+}
+
+
+variable "evaluation_periods" {
+  type        = number
+  description = "The number of periods over which data is compared to the specified threshold"
+}
+
+variable "metric_name" {
+  type        = string
+  description = "The name of the metric to monitor"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The namespace of the metric to monitor"
+}
+
+variable "period" {
+  type        = number
+  description = "The period, in seconds, over which the specified statistic is applied"
+}
+
+variable "statistic" {
+  type        = string
+  description = "The statistic to apply to the alarm's associated metric"
+}
+
+variable "threshold_greater" {
+  type        = number
+  description = "The threshold against which the specified greater statistic is compared"
+}
+
+variable "threshold_lesser" {
+  type        = number
+  description = "The threshold against which the specified lesser statistic is compared"
+}
