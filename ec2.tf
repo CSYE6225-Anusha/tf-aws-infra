@@ -23,10 +23,10 @@ resource "aws_security_group" "application_security_group" {
 
   # Egress rule to allow all outbound traffic
   egress {
-    from_port   = var.outbound_port
-    to_port     = var.outbound_port
-    protocol    = var.outbound_protocol
-    cidr_blocks = [var.destination_cidr_zero]
+    from_port        = var.outbound_port
+    to_port          = var.outbound_port
+    protocol         = var.outbound_protocol
+    cidr_blocks      = [var.destination_cidr_zero]
     ipv6_cidr_blocks = [var.destination_cidr_ipv6]
   }
 
@@ -179,12 +179,12 @@ resource "aws_security_group" "lb_sg" {
   }
 
   egress {
-  from_port        = var.outbound_port
-  to_port          = var.outbound_port
-  protocol         = var.outbound_protocol
-  cidr_blocks      = [var.destination_cidr_zero]
-  ipv6_cidr_blocks = [var.destination_cidr_ipv6]
-}
+    from_port        = var.outbound_port
+    to_port          = var.outbound_port
+    protocol         = var.outbound_protocol
+    cidr_blocks      = [var.destination_cidr_zero]
+    ipv6_cidr_blocks = [var.destination_cidr_ipv6]
+  }
 
 
   tags = {

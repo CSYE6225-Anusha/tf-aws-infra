@@ -284,8 +284,8 @@ variable "threshold_lesser" {
   description = "The threshold against which the specified lesser statistic is compared"
 }
 
-variable "mailgun_api_key"{
-  type = string
+variable "mailgun_api_key" {
+  type        = string
   description = "Mail Gun API Key"
 }
 

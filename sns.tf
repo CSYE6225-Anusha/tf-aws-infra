@@ -1,6 +1,6 @@
 resource "aws_sns_topic" "user_verification" {
   name = "user-verification-topic"
-  
+
   tags = {
     Name = "user-verification-topic"
   }
@@ -87,11 +87,11 @@ resource "aws_sns_topic" "user_verification" {
 
 
 resource "aws_lambda_function" "user_verification_lambda" {
-  filename         = "C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip"  # Relative path to the local file
-  function_name    = "user_verification_lambda"
-  role             = aws_iam_role.lambda_execution_role.arn
-  handler          = "index.handler"
-  runtime          = "nodejs18.x"
+  filename      = "C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip" # Relative path to the local file
+  function_name = "user_verification_lambda"
+  role          = aws_iam_role.lambda_execution_role.arn
+  handler       = "index.handler"
+  runtime       = "nodejs18.x"
 
   environment {
     variables = {
@@ -100,14 +100,14 @@ resource "aws_lambda_function" "user_verification_lambda" {
       # DB_PASSWORD         = aws_db_instance.db_instance.password
       # host                = aws_db_instance.db_instance.address
       # dialect             = var.dialect
-      MAILGUN_API_KEY     = var.mailgun_api_key
-      DOMAIN              = "${var.profile}.${var.domain}"
+      MAILGUN_API_KEY = var.mailgun_api_key
+      DOMAIN          = "${var.profile}.${var.domain}"
     }
   }
 
   timeout = 60
 
-  source_code_hash = filebase64sha256("C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip")  # Ensures function updates if zip changes
+  source_code_hash = filebase64sha256("C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip") # Ensures function updates if zip changes
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
@@ -135,18 +135,18 @@ resource "aws_iam_policy" "lambda_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = ["sns:Publish"],
-        Effect = "Allow",
+        Action   = ["sns:Publish"],
+        Effect   = "Allow",
         Resource = aws_sns_topic.user_verification.arn
       },
       {
-        Action = ["rds:Connect", "rds:DescribeDBInstances"],
-        Effect = "Allow",
+        Action   = ["rds:Connect", "rds:DescribeDBInstances"],
+        Effect   = "Allow",
         Resource = "*"
       },
       {
-        Action = ["ses:SendEmail"], # For SES email support if needed alongside Mailgun
-        Effect = "Allow",
+        Action   = ["ses:SendEmail"], # For SES email support if needed alongside Mailgun
+        Effect   = "Allow",
         Resource = "*"
       },
       {
@@ -155,7 +155,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Effect = "Allow",
+        Effect   = "Allow",
         Resource = "*"
       }
     ]
@@ -177,8 +177,8 @@ resource "aws_iam_role_policy" "ec2_sns_publish_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = "sns:Publish",
-        Effect = "Allow",
+        Action   = "sns:Publish",
+        Effect   = "Allow",
         Resource = aws_sns_topic.user_verification.arn
       }
     ]
