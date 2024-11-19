@@ -34,6 +34,15 @@ This Terraform configuration provisions a scalable AWS infrastructure for a web 
 - **Route 53**:
   - Sets up a Type A record in Route 53, pointing the domain to the load balancer. This makes the web application accessible at `http://(dev|demo).your-domain-name.tld`.
 
+### SNS and Lambda Integration 📩
+
+This setup enables automated email verification for new user accounts using Amazon SNS and AWS Lambda:
+
+1. **SNS Topic**: Publishes user verification events.
+2. **Lambda Function**: Processes SNS messages and sends emails using Mailgun.
+3. **IAM Role**: Grants permissions for SNS, RDS, and CloudWatch.
+4. **Trigger**: SNS automatically invokes the Lambda function when a new message is published.
+
 ## How to Use ⚙
 
 1. **Ensure Terraform installed and AWS credentials configured**:
