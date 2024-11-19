@@ -23,10 +23,11 @@ resource "aws_security_group" "application_security_group" {
 
   # Egress rule to allow all outbound traffic
   egress {
-    from_port   = var.outbound_port
-    to_port     = var.outbound_port
-    protocol    = var.outbound_protocol
-    cidr_blocks = [var.destination_cidr_zero]
+    from_port        = var.outbound_port
+    to_port          = var.outbound_port
+    protocol         = var.outbound_protocol
+    cidr_blocks      = [var.destination_cidr_zero]
+    ipv6_cidr_blocks = [var.destination_cidr_ipv6]
   }
 
   tags = {
@@ -178,11 +179,13 @@ resource "aws_security_group" "lb_sg" {
   }
 
   egress {
-    from_port   = var.outbound_port
-    to_port     = var.outbound_port
-    protocol    = var.outbound_protocol
-    cidr_blocks = [var.destination_cidr_zero]
+    from_port        = var.outbound_port
+    to_port          = var.outbound_port
+    protocol         = var.outbound_protocol
+    cidr_blocks      = [var.destination_cidr_zero]
+    ipv6_cidr_blocks = [var.destination_cidr_ipv6]
   }
+
 
   tags = {
     Name = "load_balancer_security_group"
@@ -218,6 +221,8 @@ resource "aws_launch_template" "app_lt" {
     echo "host=${aws_db_instance.db_instance.address}" >> .env
     echo "dialect=${var.dialect}" >> .env
     echo "S3_BUCKET_NAME=${aws_s3_bucket.my_bucket.bucket}" >> .env
+    echo "SNS_TOPIC_ARN=${aws_sns_topic.user_verification.arn}" >> .env
+    echo "AWS_REGION=${var.region}" >> .env
     sudo chown csye6225:csye6225 .env
     sudo chmod 755 .env
     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/csye6225/app/webapp/cloudwatch-config.json -s

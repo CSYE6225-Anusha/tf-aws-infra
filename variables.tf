@@ -283,3 +283,25 @@ variable "threshold_lesser" {
   type        = number
   description = "The threshold against which the specified lesser statistic is compared"
 }
+
+variable "mailgun_api_key" {
+  type        = string
+  description = "Mail Gun API Key"
+}
+
+variable "destination_cidr_ipv6" {
+  description = "IPv6 CIDR block for outbound traffic"
+  default     = "::/0" # Default IPv6 block for all traffic
+}
+
+variable "file_path" {
+  description = "Lambda file path"
+}
+
+variable "handler" {
+  description = "Lambda handler"
+}
+
+variable "function_name" {
+  description = "Function Name"
+}
