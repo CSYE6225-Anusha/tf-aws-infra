@@ -87,10 +87,10 @@ resource "aws_sns_topic" "user_verification" {
 
 
 resource "aws_lambda_function" "user_verification_lambda" {
-  filename      = "C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip" # Relative path to the local file
-  function_name = "user_verification_lambda"
+  filename      = var.file_path
+  function_name = var.function_name
   role          = aws_iam_role.lambda_execution_role.arn
-  handler       = "index.handler"
+  handler       = var.handler
   runtime       = "nodejs18.x"
 
   environment {
@@ -107,7 +107,7 @@ resource "aws_lambda_function" "user_verification_lambda" {
 
   timeout = 60
 
-  source_code_hash = filebase64sha256("C:\\Users\\anush\\OneDrive\\Desktop\\Cloud\\serverless\\user.zip") # Ensures function updates if zip changes
+  source_code_hash = filebase64sha256(var.file_path)
 }
 
 resource "aws_iam_role" "lambda_execution_role" {

@@ -293,3 +293,15 @@ variable "destination_cidr_ipv6" {
   description = "IPv6 CIDR block for outbound traffic"
   default     = "::/0" # Default IPv6 block for all traffic
 }
+
+variable "file_path" {
+  description = "Lambda file path"
+}
+
+variable "handler" {
+  description = "Lambda handler"
+}
+
+variable "function_name" {
+  description = "Function Name"
+}
