@@ -105,7 +105,7 @@ resource "aws_lambda_function" "user_verification_lambda" {
     }
   }
 
-  timeout = 60
+  timeout = var.timeout
 
   source_code_hash = filebase64sha256(var.file_path)
 }
