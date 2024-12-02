@@ -100,7 +100,7 @@ resource "aws_lambda_function" "user_verification_lambda" {
       # DB_PASSWORD         = aws_db_instance.db_instance.password
       # host                = aws_db_instance.db_instance.address
       # dialect             = var.dialect
-      DOMAIN          = "${var.profile}.${var.domain}"
+      DOMAIN = "${var.profile}.${var.domain}"
     }
   }
 

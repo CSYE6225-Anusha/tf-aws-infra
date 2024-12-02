@@ -1,63 +1,63 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_kms_key" "ec2_kms" {
-  description = "KMS key for EC2 EBS encryption"
-  enable_key_rotation = var.enable_key_rotation
+  description             = "KMS key for EC2 EBS encryption"
+  enable_key_rotation     = var.enable_key_rotation
   rotation_period_in_days = var.rotation_period_in_days
-#   policy = jsonencode({
-#     "Version" : "2012-10-17",
-#     "Statement" : [{
-#       "Sid" : "Enable IAM User Permissions",
-#       "Effect" : "Allow",
-#       "Principal" : {
-#         "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-#       },
-#       "Action" : "kms:*",
-#       "Resource" : "*",
-#        Condition = {
-#           StringEquals = {
-#             "aws:PrincipalArn" = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:instance/*"
-#           }
-#         }
-#     },
-#          {
-#         "Sid" : "Allow service-linked role use of the customer managed key",
-#         "Effect" : "Allow",
-#         "Principal" : {
-#           "AWS" : [
-#             "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-#           ]
-#         },
-#         "Action" : [
-#           "kms:Encrypt",
-#           "kms:Decrypt",
-#           "kms:ReEncrypt*",
-#           "kms:GenerateDataKey*",
-#           "kms:DescribeKey"
-#         ],
-#         "Resource" : "*"
-#       },
-#       {
-#         "Sid" : "Allow attachment of persistent resources",
-#         "Effect" : "Allow",
-#         "Principal" : {
-#           "AWS" : [
-#             "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-#           ]
-#         },
-#         "Action" : [
-#           "kms:CreateGrant"
-#         ],
-#         "Resource" : "*",
-#         "Condition" : {
-#           "Bool" : {
-#             "kms:GrantIsForAWSResource" : true
-#           }
-#         }
-#       }
-#     ]
-#   })
-policy = jsonencode({
+  #   policy = jsonencode({
+  #     "Version" : "2012-10-17",
+  #     "Statement" : [{
+  #       "Sid" : "Enable IAM User Permissions",
+  #       "Effect" : "Allow",
+  #       "Principal" : {
+  #         "AWS" : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+  #       },
+  #       "Action" : "kms:*",
+  #       "Resource" : "*",
+  #        Condition = {
+  #           StringEquals = {
+  #             "aws:PrincipalArn" = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:instance/*"
+  #           }
+  #         }
+  #     },
+  #          {
+  #         "Sid" : "Allow service-linked role use of the customer managed key",
+  #         "Effect" : "Allow",
+  #         "Principal" : {
+  #           "AWS" : [
+  #             "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  #           ]
+  #         },
+  #         "Action" : [
+  #           "kms:Encrypt",
+  #           "kms:Decrypt",
+  #           "kms:ReEncrypt*",
+  #           "kms:GenerateDataKey*",
+  #           "kms:DescribeKey"
+  #         ],
+  #         "Resource" : "*"
+  #       },
+  #       {
+  #         "Sid" : "Allow attachment of persistent resources",
+  #         "Effect" : "Allow",
+  #         "Principal" : {
+  #           "AWS" : [
+  #             "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  #           ]
+  #         },
+  #         "Action" : [
+  #           "kms:CreateGrant"
+  #         ],
+  #         "Resource" : "*",
+  #         "Condition" : {
+  #           "Bool" : {
+  #             "kms:GrantIsForAWSResource" : true
+  #           }
+  #         }
+  #       }
+  #     ]
+  #   })
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
       "Sid" : "Enable IAM User Permissions",
@@ -112,8 +112,8 @@ policy = jsonencode({
 }
 
 resource "aws_kms_key" "rds_kms_key" {
-  description = "My RDS KMS key"
-  enable_key_rotation = var.enable_key_rotation
+  description             = "My RDS KMS key"
+  enable_key_rotation     = var.enable_key_rotation
   rotation_period_in_days = var.rotation_period_in_days
 
   tags = {
@@ -122,8 +122,8 @@ resource "aws_kms_key" "rds_kms_key" {
 }
 
 resource "aws_kms_key" "s3_kms" {
-  description = "KMS key for S3 Bucket encryption"
-  enable_key_rotation = var.enable_key_rotation
+  description             = "KMS key for S3 Bucket encryption"
+  enable_key_rotation     = var.enable_key_rotation
   rotation_period_in_days = var.rotation_period_in_days
   tags = {
     Name = "S3 KMS Key"
@@ -145,10 +145,10 @@ resource "aws_kms_key" "secrets_manager_key" {
         Resource  = "*"
       },
       {
-        Sid      = "Allow Secrets Manager to use the key",
-        Effect   = "Allow",
+        Sid       = "Allow Secrets Manager to use the key",
+        Effect    = "Allow",
         Principal = { Service = "secretsmanager.amazonaws.com" },
-        Action   = [
+        Action = [
           "kms:Decrypt",
           "kms:Encrypt",
           "kms:GenerateDataKey*",
@@ -158,14 +158,14 @@ resource "aws_kms_key" "secrets_manager_key" {
       }
     ]
   })
-   tags = {
+  tags = {
     Name = "Secrets Manager KMS Key"
   }
 }
 
 resource "random_password" "db_password" {
-  length           = var.password_length
-  special          = var.password_special
+  length  = var.password_length
+  special = var.password_special
 }
 
 resource "aws_secretsmanager_secret" "db_password" {
@@ -200,7 +200,7 @@ resource "aws_iam_role_policy" "secrets_access_policy" {
 }
 
 resource "aws_secretsmanager_secret" "mailgun_api_key" {
-  name = "mailgun-api-key"
+  name       = "mailgun-api-key"
   kms_key_id = aws_kms_key.secrets_manager_key.arn
 }
 
@@ -210,8 +210,8 @@ resource "aws_secretsmanager_secret_version" "mailgun_api_key_version" {
 }
 
 resource "aws_iam_role_policy" "lambda_secretsmanager_policy" {
-  name   = "lambda-secretsmanager-policy"
-  role   = aws_iam_role.lambda_execution_role.name
+  name = "lambda-secretsmanager-policy"
+  role = aws_iam_role.lambda_execution_role.name
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
