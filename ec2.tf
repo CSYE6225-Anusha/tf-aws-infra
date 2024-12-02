@@ -4,13 +4,13 @@ resource "aws_security_group" "application_security_group" {
   vpc_id      = aws_vpc.main.id
 
   # Ingress rule to allow SSH (Port 22)
-  ingress {
-    description = "Allow SSH from anywhere"
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = var.protocol
-    cidr_blocks = [var.destination_cidr_zero]
-  }
+  # ingress {
+  #   description = "Allow SSH from anywhere"
+  #   from_port   = var.ssh_port
+  #   to_port     = var.ssh_port
+  #   protocol    = var.protocol
+  #   cidr_blocks = [var.destination_cidr_zero]
+  # }
 
   # Ingress rule to allow traffic on my application port 
   ingress {
@@ -92,8 +92,10 @@ resource "aws_db_instance" "db_instance" {
   multi_az               = var.multi_az
   identifier             = var.identifier
   username               = var.username
-  password               = var.password
+  password               = random_password.db_password.result
   allocated_storage      = var.allocated_storage
+  storage_encrypted      = var.storage_encrypted
+  kms_key_id             = aws_kms_key.rds_kms_key.arn
   db_subnet_group_name   = aws_db_subnet_group.private_db_subnet_group.name
   publicly_accessible    = var.publicly_accessible
   db_name                = var.db_name
@@ -162,13 +164,13 @@ resource "aws_security_group" "lb_sg" {
   description = "Security group for the load balancer"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    description = "Allow HTTP traffic from anywhere"
-    from_port   = var.http_port
-    to_port     = var.http_port
-    protocol    = var.protocol
-    cidr_blocks = [var.destination_cidr_zero]
-  }
+  # ingress {
+  #   description = "Allow HTTP traffic from anywhere"
+  #   from_port   = var.http_port
+  #   to_port     = var.http_port
+  #   protocol    = var.protocol
+  #   cidr_blocks = [var.destination_cidr_zero]
+  # }
 
   ingress {
     description = "Allow HTTPS traffic from anywhere"
@@ -204,6 +206,17 @@ resource "aws_launch_template" "app_lt" {
     security_groups             = [aws_security_group.application_security_group.id]
   }
 
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size           = var.volume_size
+      volume_type           = var.volume_type
+      delete_on_termination = var.delete_on_termination
+      encrypted             = true
+      kms_key_id            = aws_kms_key.ec2_kms.arn
+    }
+  }
+
   iam_instance_profile {
     name = aws_iam_instance_profile.instance_profile.name
   }
@@ -212,12 +225,17 @@ resource "aws_launch_template" "app_lt" {
 
   user_data = base64encode(<<-EOF
     #!/bin/bash
+    sudo apt-get update
+    sudo snap install aws-cli --classic
     cd /opt/csye6225/app/webapp
+    DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id db-password --query 'SecretString' --output text)
+    echo "DB_PASSWORD is: $DB_PASSWORD"
+    echo "DB_PASSWORD is: $DB_PASSWORD" >> /var/log/cloud-init-output.log
     touch .env
     echo "PORT=${var.port}" >> .env
     echo "DB_NAME=${aws_db_instance.db_instance.db_name}" >> .env
     echo "DB_USERNAME=${aws_db_instance.db_instance.username}" >> .env
-    echo "DB_PASSWORD=${aws_db_instance.db_instance.password}" >> .env
+    echo "DB_PASSWORD=$DB_PASSWORD" >> .env
     echo "host=${aws_db_instance.db_instance.address}" >> .env
     echo "dialect=${var.dialect}" >> .env
     echo "S3_BUCKET_NAME=${aws_s3_bucket.my_bucket.bucket}" >> .env
@@ -345,11 +363,18 @@ resource "aws_lb_target_group" "app_target_group" {
   }
 }
 
+data "aws_acm_certificate" "ssl_certificate" {
+  domain   = "${var.profile}.${var.domain}"
+  statuses = ["ISSUED"]
+}
+
+
 # Load Balancer Listener
 resource "aws_lb_listener" "app_lb_listener" {
   load_balancer_arn = aws_lb.app-lb.arn
-  port              = var.http_port
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = data.aws_acm_certificate.ssl_certificate.arn
 
   default_action {
     type             = "forward"
