@@ -8,10 +8,10 @@ This Terraform configuration provisions a scalable AWS infrastructure for a web 
 
 ### Security Groups 🔒
 - **Application Security Group**: 
-  - Configures access restrictions for EC2 instances in the auto-scaling group. Direct internet access is blocked; only port 22 (SSH) traffic is allowed from the load balancer security group.
+  - Configures access restrictions for EC2 instances in the auto-scaling group.
   
 - **Load Balancer Security Group**:
-  - Manages ingress rules to allow HTTP and HTTPS traffic on ports 80 and 443 from any IP, ensuring secure traffic routing to the web application.
+  - Manages ingress rules to allow HTTPS traffic on port 443 from any IP, ensuring secure traffic routing to the web application.
 
 ### Auto-Scaling and Load Balancing ⚖️
 - **Auto-Scaling Group**:
@@ -32,14 +32,52 @@ This Terraform configuration provisions a scalable AWS infrastructure for a web 
 
 ### DNS Configuration 🌐
 - **Route 53**:
-  - Sets up a Type A record in Route 53, pointing the domain to the load balancer. This makes the web application accessible at `http://(dev|demo).your-domain-name.tld`.
+  - Sets up a Type A record in Route 53, pointing the domain to the load balancer. This makes the web application accessible at `https://(dev|demo).your-domain-name.tld`.
+
+## AWS Key Management Service (KMS) 🔐
+
+### Encryption Keys:
+- Separate KMS keys created for:
+  - **EC2 Instances**
+  - **RDS Database**
+  - **S3 Buckets**
+  - **Secrets Manager** (for storing credentials and database passwords)
+- Keys rotate every 90 days for enhanced security.
+- Resources leverage these keys for encryption.
+
+---
+
+## Secrets Management 🔏
+
+### Database Password:
+- Auto-generated password stored in **AWS Secrets Manager**, encrypted with a custom KMS key.
+- Retrieved during instance initialization via a **user-data script**.
+
+### Email Service Credentials:
+- Lambda function fetches credentials securely from **AWS Secrets Manager** using KMS encryption.
+
+---
+
+## SSL Certificates ✅
+
+### Development Environment:
+- **AWS Certificate Manager** provides SSL certificates.
+
+### Demo Environment:
+- Import third-party SSL certificates (e.g., from Namecheap) into **AWS Certificate Manager**. 
+- Follow these steps to import certificates:
+
+```bash
+aws acm import-certificate --certificate fileb://demo_anushakadali_me.crt
+--certificate-chain fileb://demo_anushakadali_me.ca-bundle --private-key fileb://private.key
+```
 
 ### SNS and Lambda Integration 📩
 
 This setup enables automated email verification for new user accounts using Amazon SNS and AWS Lambda:
 
 1. **SNS Topic**: Publishes user verification events.
-2. **Lambda Function**: Processes SNS messages and sends emails using Mailgun.
+2. **Lambda Function**: Sends verification emails securely using Mailgun. Automatically retrieves email service credentials from Secrets Manager.
 3. **IAM Role**: Grants permissions for SNS, RDS, and CloudWatch.
 4. **Trigger**: SNS automatically invokes the Lambda function when a new message is published.
 
